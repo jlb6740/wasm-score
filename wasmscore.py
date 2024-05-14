@@ -113,6 +113,8 @@ sg_benchmarks_wasm = {
     "bzip2": "bz2/benchmark.wasm",
     "hex-simd": "hex-simd/benchmark.wasm",
     # "image-classification": "image-classification/image-classification-benchmark.wasm",
+    "tract_mobilenet_v2_onnx": "inference_tract/mobile_net_v2_onnx_benchmark.wasm",
+    "tract_mobilenet_v2_tensorflow": "inference_tract/mobile_net_v2_tensorflow_benchmark.wasm",
     "intgemm-simd": "intgemm-simd/benchmark.wasm",
     "libsodium-aead_aes256gcm": "libsodium/libsodium-aead_aes256gcm.wasm",
     "libsodium-aead_aes256gcm2": "libsodium/libsodium-aead_aes256gcm2.wasm",
@@ -242,7 +244,7 @@ perf_suites = {
     "app-wasmscore": ["meshoptimizer"],
     "core-wasmscore": ["ackermann", "ctype", "fibonacci"],
     "crypto-wasmscore": ["base64", "ed25519", "seqhash"],
-    "ai-wasmscore": [],
+    "ai-wasmscore": ["tract_mobilenet_v2_onnx", "tract_mobilenet_v2_tensorflow"],
     "regex-wasmscore": [],
     "shootout": [
         "base64",
