@@ -7,9 +7,12 @@ name: "Validate Build"
 on: push
 
 jobs:
-  Validate_Build:
+  validate_build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     name: Validate Build
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -28,4 +31,3 @@ jobs:
 
       - name: Check QuickRun
         run: docker run wasmscore -t quickrun_all
-
