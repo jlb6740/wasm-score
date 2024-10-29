@@ -13,6 +13,8 @@ import numpy as np
 from termcolor import colored
 import yaml
 
+vtune = os.getenv('vtune')
+
 # Command line options
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -95,6 +97,13 @@ parser.add_argument(
     action="store_true",
     help="Check the build version",
 )
+
+if vtune == "true":
+    parser.add_argument(
+        "--vtune",
+        action="store_true",
+        help="Runs vtune for each benchmark",
+    )
 
 # Global Variables
 args = parser.parse_args()
@@ -482,13 +491,26 @@ def run_benchmarks(benchmark, run_native=False):
                 print(f"Building native failed with error code {error.returncode}")
                 sys.exit(error.returncode)
 
-        cli_cmd_string = (
+        if ARGS_DICT["vtune"]:
+            print("Vtune will be run")
+            cli_cmd_string = (
+            "cd /sightglass/perf_results && "
+            "LD_LIBRARY_PATH=/sightglass/engines/native/ "
+            "vtune -collect hotspots "
+            "/sightglass/target/release/sightglass-cli benchmark "
+            f"{native_benchmark_path} --engine "
+            f"/sightglass/engines/native/libengine.so --processes={DEFAULT_BENCH_PROCESS_NUM} --raw "
+            f"--output-format csv --output-file {results_path}"
+            )
+        else:
+            print("Vtune will not run")
+            cli_cmd_string = (
             "LD_LIBRARY_PATH=/sightglass/engines/native/ "
             "/sightglass/target/release/sightglass-cli benchmark "
             f"{native_benchmark_path} --engine "
             f"/sightglass/engines/native/libengine.so --processes={DEFAULT_BENCH_PROCESS_NUM} --raw "
             f"--output-format csv --output-file {results_path}"
-        )
+            )
 
         try:
             logging.info(
@@ -600,12 +622,22 @@ def run_benchmarks(benchmark, run_native=False):
 
     termgraph_title = f"{benchmark} wasm time(ns)"
 
-    cli_cmd_string = (
-        f"/sightglass/target/release/sightglass-cli benchmark "
-        f"--processes={DEFAULT_BENCH_PROCESS_NUM} --engine "
-        f"/sightglass/engines/wasmtime/libengine.so --raw --output-format csv --output-file "
-        f"{results_path} -- {wasm_benchmark_path}"
-    )
+    if ARGS_DICT["vtune"]:
+        print("Vtune will be run")
+        cli_cmd_string = (
+            f"/sightglass/target/release/sightglass-cli benchmark "
+            f"--processes={DEFAULT_BENCH_PROCESS_NUM} --engine "
+            f"/sightglass/engines/wasmtime/libengine.so --raw --output-format csv --output-file "
+            f"{results_path} -- {wasm_benchmark_path}"
+        )
+    else:
+        print("Vtune will not run")
+        cli_cmd_string = (
+            f"/sightglass/target/release/sightglass-cli benchmark "
+            f"--processes={DEFAULT_BENCH_PROCESS_NUM} --engine "
+            f"/sightglass/engines/wasmtime/libengine.so --raw --output-format csv --output-file "
+            f"{results_path} -- {wasm_benchmark_path}"
+        )
 
     try:
         logging.info(
