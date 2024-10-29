@@ -625,6 +625,8 @@ def run_benchmarks(benchmark, run_native=False):
     if ARGS_DICT["vtune"]:
         print("Vtune will be run")
         cli_cmd_string = (
+            "cd /sightglass/perf_results && "
+            "vtune -collect hotspots "
             f"/sightglass/target/release/sightglass-cli benchmark "
             f"--processes={DEFAULT_BENCH_PROCESS_NUM} --engine "
             f"/sightglass/engines/wasmtime/libengine.so --raw --output-format csv --output-file "
